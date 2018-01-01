@@ -28,6 +28,10 @@ int main(){
 
   };
 
+  GLuint vao;
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
+
   
   GLuint vbo;
   glGenBuffers(1, &vbo);
@@ -74,6 +78,8 @@ int main(){
 
   glCompileShader(fragmentShader);  
 
+  //Shader error check
+  
   GLint status;
   glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
 
@@ -86,6 +92,19 @@ int main(){
   if(status == GL_TRUE){
     printf("Fragment shader was compiled successfully!\n");
   }
+
+  GLuint shaderProgram = glCreateProgram();
+  glAttachShader(shaderProgram, vertexShader);
+  glAttachShader(shaderProgram, fragmentShader);
+
+  glBindFragDataLocation(shaderProgram, 0, "outColor");
+
+  glLinkProgram(shaderProgram);
+  glUseProgram(shaderProgram);
+
+  GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
+  glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+  glEnableVertexAttribArray(posAttrib);
   
   bool running = true;
   while(running){
@@ -106,6 +125,13 @@ int main(){
       }
       
     }
+
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    window.display();
   }
   
   return 0;
